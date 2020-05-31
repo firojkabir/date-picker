@@ -186,20 +186,75 @@ export default class MyDatePicker extends Component {
         })
     }
 
-    
+    // RENDERERS
 
+    renderCalender() {
+        let days = this.state.monthDetails.map((day, index) => {
+            return (
+                <div className={'c-day-container ' + (day.month !== 0 ? ' disabled' : '') + 
+                (this.isCurrentDay(day) ? ' highlight' : '') + (this.isSelectedDay(day) ? ' highlight-green' : '')} key={index}>
+                    <div className='cdc-day'>
+                        <span onClick={()=>this.onDateClick(day)}>
+                            {day.date}
+                        </span>
+                    </div>
+                </div>
+            )
+        })
 
-
+        return (
+            <div className='c-container'>
+                <div className='cc-head'>
+                    {['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'].map((d,i)=><div key={i} className='cch-name'>{d}</div>)}
+                </div>
+                <div className='cc-body'>
+                    {days}
+                </div>
+            </div>
+        )
+    }
 
     render() {
         return (
             <div className='MyDatePicker'>
                 <div className='mdp-input' onClick={() => this.showDatePicker(true)}>
-                    <input type='date' />
+                    <input type='date' onChange={this.updateDateFromInput} ref={inputRef} />
                 </div>
                 {
                     this.state.showDatePicker ? 
-                    ( <div className='mdp-container'></div> ) :
+                    ( 
+                        <div className='mdp-container'>
+                            <div className='mdpc-head'>
+                                <div className='mdpch-button'>
+                                    <div className='mdpchb-inner' onClick={()=> this.setYear(-1)}>
+                                        <span className='mdpchbi-left-arrows'></span>
+                                    </div>
+                                </div>
+                                <div className='mdpch-button'>
+                                    <div className='mdpchb-inner' onClick={()=> this.setMonth(-1)}>
+                                        <span className='mdpchbi-left-arrow'></span>
+                                    </div>
+                                </div>
+                                <div className='mdpch-container'>
+                                    <div className='mdpchc-year'>{this.state.year}</div>
+                                    <div className='mdpchc-month'>{this.getMonthStr(this.state.month)}</div>
+                                </div>
+                                <div className='mdpch-button'>
+                                    <div className='mdpchb-inner' onClick={()=> this.setMonth(1)}>
+                                        <span className='mdpchbi-right-arrow'></span>
+                                    </div>
+                                </div>
+                                <div className='mdpch-button' onClick={()=> this.setYear(1)}>
+                                    <div className='mdpchb-inner'>
+                                        <span className='mdpchbi-right-arrows'></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className='mdpc-body'>
+                                {this.renderCalender()}
+                            </div>
+                        </div> 
+                    ) :
                     ''
                 }
             </div>
