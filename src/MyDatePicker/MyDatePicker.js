@@ -99,8 +99,41 @@ export default class MyDatePicker extends Component {
         return monthArray;
     }
 
+    isCurrentDay = day => {
+        return day.timestamp === todayTimestamp;
+    }
 
+    isSelectedDay = day => {
+        return day.timestamp === this.state.selectedDay;
+    }
 
+    getDateFromDateString = dateValue => {
+        let dateData = dateValue.split('-').map(d=>parseInt(d, 10));
+        if(dateData.length < 3)
+            return null;
+        
+        let year = dateData[0];
+        let month = dateData[1];
+        let date = dateData[2];
+        return {year, month, date};
+    }
+
+    getMonthStr = month => this.monthMap[Math.max(Math.min(11, month), 0)] || 'Month';
+
+    getDateStringFromTimestamp = timestamp => {
+        let dateObject = new Date(timestamp);
+        let month = dateObject.getMonth() + 1;
+        let date = dateObject.getDate();
+        return dateObject.getFullYear() + '-' + (month < 10 ? '0'+month : month) + '-' + (date < 10 ? '0'+date : date);
+    }
+
+    setData = dateData => {
+        let selectedDay = new Date(dateData.year, dateData.month-1, dateData.date).getTime();
+        this.setState({ selectedDay })
+        if(this.props.onChange) {
+            this.props.onChange(selectedDay);
+        }
+    }
 
 
 
