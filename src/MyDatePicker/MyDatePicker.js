@@ -4,10 +4,25 @@ import './MyDatePicker.css';
 
 let oneDay = 60 * 60 * 24 * 1000;
 let todayTimestamp = Date.now() - (Date.now() % oneDay) + (new Date().getTimezoneOffset() * 1000 * 60);
+let inputRef = React.createRef();
 
 export default class MyDatePicker extends Component {
+    
     state = {
         getMonthDetails: []
+    }
+
+    constructor() {
+        super();
+        let date = new Date();
+        let year = date.getFullYear();
+        let month = date.getMonth();
+        this.state = {
+            year,
+            month,
+            selectedDay: todayTimestamp,
+            monthDetails: this.getMonthDetails(year, month)
+        }
     }
 
     componentDidMount() {
@@ -27,6 +42,70 @@ export default class MyDatePicker extends Component {
     showDatePicker = (showDatePicker = true) => {
         this.setState({ showDatePicker });
     }
+
+    // CORE
+
+    daysMap = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    monthMap = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+ 
+    getDayDetails = args => {
+        let date = args.index - args.firstDay;
+        let day = args.index%7;
+        let prevMonth = args.month-1;
+        let prevYear = args.year;
+        if(prevMonth < 0) {
+            prevMonth = 11;
+            prevYear--;
+        }
+        let prevMonthNumberOfDays = this.getNumberOfDays(prevYear, prevMonth);
+        let _date = (date < 0 ? prevMonthNumberOfDays+date : date % args.numberOfDays) + 1;
+        let month = date < 0 ? -1 : date >= args.numberOfDays ? 1 : 0;
+        let timestamp = new Date(args.year, args.month, _date).getTime();
+        return {
+            date: _date,
+            day,
+            month,
+            timestamp,
+            dayString: this.daysMap[day]
+        }
+    }
+
+    getNumberOfDays = (year, month) => {
+        return 40 - new Date(year, month, 40).getDate();
+    }
+    
+    getMonthDetails = (year, month) => {
+        let firstDay = (new Date(year, month)).getDay();
+        let numberOfDays = this.getNumberOfDays(year, month);
+        let monthArray = [];
+        let rows = 6;
+        let currentDay = null;
+        let index = 0;
+        let cols = 7;
+
+        for(let row=0; row<rows; row++) {
+            for(let col=0; col<cols; col++) {
+                currentDay = this.getDayDetails({
+                    index,
+                    numberOfDays,
+                    firstDay,
+                    year,
+                    month
+                });
+                monthArray.push(currentDay);
+                index++;
+            }
+        }
+        return monthArray;
+    }
+
+
+
+
+
+
+
+
 
     render() {
         return (
