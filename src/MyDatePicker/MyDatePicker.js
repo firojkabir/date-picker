@@ -135,7 +135,58 @@ export default class MyDatePicker extends Component {
         }
     }
 
+    updateDateFromInput = () => {
+        let dateValue = inputRef.current.value;
+        let dateData = this.getDateFromDateString(dateValue);
+        if(dateData !== null) {
+            this.setDate(dateData);
+            this.setState({
+                year: dateData.year,
+                month: dateData.month-1,
+                monthDetails: this.getMonthDetails(dateData.year, dateData.month-1)
+            })
+        }
+    }
 
+    setDateToInput = (timestamp) => {
+        let dateString = this.getDateStringFromTimestamp(timestamp);
+        inputRef.current.value = dateString;
+    }
+
+    onDateClick = day => {
+        this.setState({selectedDay: day.timestamp}, () => this.setDateToInput(day.timestamp));
+        if(this.props.onChange) {
+            this.props.onChange(day.timestamp);
+        }
+    }
+
+    setYear = offset => {
+        let year = this.state.year + offset;
+        let month = this.state.month;
+        this.setState({
+            year,
+            monthDetails: this.getMonthDetails(year, month)
+        })
+    }
+
+    setMonth = offset => {
+        let year = this.state.year;
+        let month = this.state.month + offset;
+        if(month === -1) {
+            month = 11;
+            year--;
+        } else if(month === 12) {
+            month = 0;
+            year++;
+        }
+        this.setState({
+            year,
+            month,
+            monthDetails: this.getMonthDetails(year, month)
+        })
+    }
+
+    
 
 
 
